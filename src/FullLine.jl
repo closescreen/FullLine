@@ -10,8 +10,8 @@ end
 
 Base.eltype(i::EachFullLine) = Array{SubString{String},1}
  
-"each_full_line( i::EachLine, '*', 10)"
-eachFullLine( iter::EachLine, sep::Char, need_fields_count::Int; warn::Bool=true, skip::Bool=true) = 
+"each_full_line( i::EachLine, '*', 10) # returns iterator of field values tuples"
+each_full_line( iter::EachLine, sep::Char, need_fields_count::Int; warn::Bool=true, skip::Bool=true) = 
   EachFullLine( iter, sep, need_fields_count, warn, skip)
  
 "filename|> eachline |> each_full_line( '*', 10)"
