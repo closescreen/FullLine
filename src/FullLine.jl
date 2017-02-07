@@ -1,7 +1,9 @@
 module FullLine
 
+typealias LineIter Union{EachLine,Base.Generator,Filter}
+
 type EachFullLine
- source_iter::EachLine
+ source_iter::LineIter
  sep::Char
  need_fields_count::Int
  warn::Bool
@@ -11,12 +13,12 @@ end
 Base.eltype(i::EachFullLine) = Array{SubString{String},1}
  
 "each_full_line( i::EachLine, '*', 10) # returns iterator of field values tuples"
-each_full_line( iter::EachLine, sep::Char, need_fields_count::Int; warn::Bool=true, skip::Bool=true) = 
+each_full_line( iter::LineIter, sep::Char, need_fields_count::Int; warn::Bool=true, skip::Bool=true) = 
   EachFullLine( iter, sep, need_fields_count, warn, skip)
  
 "filename|> eachline |> each_full_line( '*', 10)"
 each_full_line( sep::Char, need_fields_count::Int; warn::Bool=true, skip::Bool=true ) = 
-  iter::EachLine->EachFullLine( iter, sep, need_fields_count, warn, skip)
+  iter::LineIter->EachFullLine( iter, sep, need_fields_count, warn, skip)
 
 
 function Base.next( j::EachFullLine, state)
@@ -31,12 +33,12 @@ function Base.next( j::EachFullLine, state)
    if done( j.source_iter, newstate)
     j.warn && warn("Fields count $(length(rvv)) less then need: $(j.need_fields_count):\n$rvv")
     if j.skip
-     return(fill( SubString{String}(""), j.need_fields_count ),newstate)
+     return fill( SubString{String}(""), j.need_fields_count ),newstate
     else 
-     return(rvv,newstate)
+     return rvv,newstate
     end 
    end    
-   (newline, newstate) = next( j.source_iter, newstate)
+   newline,newstate = next( j.source_iter, newstate)
    rvv2 = split( chomp(newline), j.sep )
 
    rvv[end] = rvv[end]*shift!(rvv2)
